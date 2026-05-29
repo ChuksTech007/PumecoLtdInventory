@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { IBranch, IFuelTank } from '@/types'
+import OtherSelect from '@/components/ui/OtherSelect'
 
 interface Props {
   branches: IBranch[]
@@ -33,12 +34,13 @@ export default function FuelTankForm({ branches, tank }: Props) {
     }
   }
 
-  const inp = (label: string, name: string, type = 'text', required = false, extra?: any) => (
+  const cls = 'w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 transition'
+
+  const inp = (label: string, name: string, type = 'text', extra?: any) => (
     <div>
-      <label className="block text-xs font-medium text-gray-400 mb-1">{label}{required && ' *'}</label>
-      <input type={type} name={name} required={required} defaultValue={tank ? (tank as any)[name] ?? '' : ''}
-        className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 transition"
-        {...extra} />
+      <label className="block text-xs font-medium text-gray-400 mb-1">{label}</label>
+      <input type={type} name={name} title={label} defaultValue={tank ? (tank as any)[name] ?? '' : ''}
+        className={cls} {...extra} />
     </div>
   )
 
@@ -47,37 +49,33 @@ export default function FuelTankForm({ branches, tank }: Props) {
       {error && <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg px-4 py-3">{error}</div>}
 
       <div className="grid grid-cols-2 gap-4">
-        {inp('Tank Name', 'name', 'text', true)}
-        {inp('Tank Number', 'tank_number', 'text', true)}
+        {inp('Tank Name *', 'name')}
+        {inp('Tank Number', 'tank_number')}
+
+        <OtherSelect
+          name="fuel_type"
+          label="Fuel Type"
+          options={['diesel', 'petrol', 'kerosene', 'lpg']}
+          defaultValue={tank?.fuel_type ?? ''}
+        />
 
         <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1">Fuel Type *</label>
-          <select name="fuel_type" required defaultValue={tank?.fuel_type ?? ''} title="Fuel type"
-            className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
-            <option value="">Select fuel type</option>
-            <option value="diesel">Diesel</option>
-            <option value="petrol">Petrol</option>
-            <option value="kerosene">Kerosene</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1">Branch *</label>
-          <select name="branch_id" required defaultValue={typeof tank?.branch_id === 'object' ? (tank.branch_id as any)._id : (tank?.branch_id ?? '')} title="Branch"
-            className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
+          <label className="block text-xs font-medium text-gray-400 mb-1">Branch</label>
+          <select name="branch_id" title="Branch"
+            defaultValue={typeof tank?.branch_id === 'object' ? (tank.branch_id as any)._id : (tank?.branch_id ?? '')}
+            className={cls}>
             <option value="">Select branch</option>
             {branches.map(b => <option key={b._id} value={b._id}>{b.name}</option>)}
           </select>
         </div>
 
-        {inp('Capacity (L)', 'capacity', 'number', true, { min: 1 })}
-        {inp('Current Level (L)', 'current_level', 'number', false, { min: 0, defaultValue: tank?.current_level ?? 0 })}
-        {inp('Minimum Level (L)', 'minimum_level', 'number', false, { min: 0, defaultValue: tank?.minimum_level ?? 0 })}
+        {inp('Capacity (L)', 'capacity', 'number', { min: 1 })}
+        {inp('Current Level (L)', 'current_level', 'number', { min: 0, defaultValue: tank?.current_level ?? 0 })}
+        {inp('Minimum Level (L)', 'minimum_level', 'number', { min: 0, defaultValue: tank?.minimum_level ?? 0 })}
 
         <div>
           <label className="block text-xs font-medium text-gray-400 mb-1">Active Status</label>
-          <select name="is_active" defaultValue={tank ? String(tank.is_active) : 'true'} title="Active status"
-            className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
+          <select name="is_active" title="Active status" defaultValue={tank ? String(tank.is_active) : 'true'} className={cls}>
             <option value="true">Active</option>
             <option value="false">Inactive</option>
           </select>
@@ -86,7 +84,7 @@ export default function FuelTankForm({ branches, tank }: Props) {
 
       <div>
         <label className="block text-xs font-medium text-gray-400 mb-1">Notes</label>
-        <textarea name="notes" rows={3} defaultValue={tank?.notes ?? ''}
+        <textarea name="notes" title="Notes" rows={3} defaultValue={tank?.notes ?? ''}
           className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 resize-none" />
       </div>
 

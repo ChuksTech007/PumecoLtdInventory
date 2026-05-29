@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import type { IBranch, IUser, IVehicle } from '@/types'
+import OtherSelect from '@/components/ui/OtherSelect'
 
 interface Props {
   branches: IBranch[]
@@ -10,7 +11,7 @@ interface Props {
   vehicle?: IVehicle
 }
 
-const TYPES = ['car','bus','truck','pickup','grader','excavator','roller','bulldozer','crane','tanker','other']
+const TYPES = ['car','bus','truck','pickup','grader','excavator','roller','bulldozer','crane','tanker']
 
 export default function VehicleForm({ branches, drivers, vehicle }: Props) {
   const router = useRouter()
@@ -36,11 +37,22 @@ export default function VehicleForm({ branches, drivers, vehicle }: Props) {
     }
   }
 
-  const field = (label: string, name: string, type = 'text', required = false, extra?: any) => (
+  const field = (label: string, name: string, type = 'text', extra?: any) => (
     <div>
-      <label className="block text-xs font-medium text-gray-400 mb-1">{label}{required && ' *'}</label>
-      <input type={type} name={name} required={required} defaultValue={vehicle ? (vehicle as any)[name] : ''} {...extra}
+      <label className="block text-xs font-medium text-gray-400 mb-1">{label}</label>
+      <input type={type} name={name} defaultValue={vehicle ? (vehicle as any)[name] ?? '' : ''} {...extra}
         className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 transition" />
+    </div>
+  )
+
+  const sel = (label: string, name: string, options: {v:string;l:string}[], def?: string) => (
+    <div>
+      <label className="block text-xs font-medium text-gray-400 mb-1">{label}</label>
+      <select name={name} defaultValue={def ?? ''} title={label}
+        className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
+        <option value="">— Select —</option>
+        {options.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
+      </select>
     </div>
   )
 
@@ -49,46 +61,28 @@ export default function VehicleForm({ branches, drivers, vehicle }: Props) {
       {error && <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg px-4 py-3">{error}</div>}
 
       <div className="grid grid-cols-2 gap-4">
-        {field('Registration Number', 'registration_number', 'text', true)}
+        {field('Registration Number *', 'registration_number')}
         {field('Fleet Number', 'fleet_number')}
-        {field('Make', 'make', 'text', true)}
-        {field('Model', 'model', 'text', true)}
+        {field('Make', 'make')}
+        {field('Model', 'model')}
         {field('Year', 'year', 'number')}
         {field('Color', 'color')}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1">Type *</label>
-          <select name="type" required defaultValue={vehicle?.type ?? ''}
-            className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
-            <option value="">Select type</option>
-            {TYPES.map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1">Status</label>
-          <select name="status" defaultValue={vehicle?.status ?? 'active'}
-            className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
-            {['active','in_service','breakdown','decommissioned'].map(s => <option key={s} value={s}>{s.replace(/_/g,' ')}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1">Branch</label>
-          <select name="branch_id" defaultValue={typeof vehicle?.branch_id === 'object' ? (vehicle.branch_id as any)._id : (vehicle?.branch_id ?? '')}
-            className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
-            <option value="">No branch</option>
-            {branches.map(b => <option key={b._id} value={b._id}>{b.name}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1">Assigned Driver</label>
-          <select name="assigned_driver_id" defaultValue={typeof vehicle?.assigned_driver_id === 'object' ? (vehicle.assigned_driver_id as any)._id : (vehicle?.assigned_driver_id ?? '')}
-            className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
-            <option value="">Not assigned</option>
-            {drivers.map(d => <option key={d._id} value={d._id}>{d.name}</option>)}
-          </select>
-        </div>
+        <OtherSelect name="type" label="Vehicle Type" options={TYPES} defaultValue={vehicle?.type ?? ''} />
+        {sel('Status', 'status',
+          ['active','in_service','breakdown','decommissioned'].map(s => ({ v: s, l: s.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()) })),
+          vehicle?.status ?? 'active'
+        )}
+        {sel('Branch', 'branch_id',
+          branches.map(b => ({ v: b._id, l: b.name })),
+          typeof vehicle?.branch_id === 'object' ? (vehicle.branch_id as any)._id : (vehicle?.branch_id ?? '')
+        )}
+        {sel('Assigned Driver', 'assigned_driver_id',
+          drivers.map(d => ({ v: d._id, l: d.name })),
+          typeof vehicle?.assigned_driver_id === 'object' ? (vehicle.assigned_driver_id as any)._id : (vehicle?.assigned_driver_id ?? '')
+        )}
       </div>
 
       <div className="grid grid-cols-3 gap-4">
@@ -98,11 +92,13 @@ export default function VehicleForm({ branches, drivers, vehicle }: Props) {
         {field('Insurance Expiry', 'insurance_expiry', 'date')}
         {field('Road Worthiness Expiry', 'road_worthiness_expiry', 'date')}
         {field('Engine Number', 'engine_number')}
+        {field('Chassis Number', 'chassis_number')}
+        {field('Next Service Mileage (km)', 'next_service_mileage', 'number')}
       </div>
 
       <div>
         <label className="block text-xs font-medium text-gray-400 mb-1">Notes</label>
-        <textarea name="notes" rows={3} defaultValue={vehicle?.notes ?? ''}
+        <textarea name="notes" title="Notes" rows={3} defaultValue={vehicle?.notes ?? ''}
           className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 resize-none" />
       </div>
 

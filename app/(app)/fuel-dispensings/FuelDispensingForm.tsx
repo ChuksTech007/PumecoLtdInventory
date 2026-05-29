@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { IBranch, IFuelTank, IVehicle, IUser } from '@/types'
+import OtherSelect from '@/components/ui/OtherSelect'
 
-const PURPOSES = ['vehicle_fueling', 'generator', 'branch_transfer', 'equipment', 'other']
+const PURPOSES = ['vehicle_fueling', 'generator', 'branch_transfer', 'equipment', 'compactor', 'site_operations']
 
 interface Props {
   tanks: IFuelTank[]
@@ -39,12 +40,12 @@ export default function FuelDispensingForm({ tanks, branches, vehicles, drivers 
     }
   }
 
-  const inp = (label: string, name: string, type = 'text', required = false, extra?: any) => (
+  const cls = 'w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 transition'
+
+  const inp = (label: string, name: string, type = 'text', extra?: any) => (
     <div>
-      <label className="block text-xs font-medium text-gray-400 mb-1">{label}{required && ' *'}</label>
-      <input type={type} name={name} required={required}
-        className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 transition"
-        {...extra} />
+      <label className="block text-xs font-medium text-gray-400 mb-1">{label}</label>
+      <input type={type} name={name} title={label} className={cls} {...extra} />
     </div>
   )
 
@@ -53,14 +54,13 @@ export default function FuelDispensingForm({ tanks, branches, vehicles, drivers 
       {error && <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg px-4 py-3">{error}</div>}
 
       <div className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-xs rounded-lg px-4 py-3">
-        Note: Tank fuel level will be automatically deducted. Vehicle mileage will be updated if provided.
+        Tank fuel level will be automatically deducted. Vehicle mileage will be updated if provided.
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-xs font-medium text-gray-400 mb-1">Fuel Tank *</label>
-          <select name="fuel_tank_id" required title="Fuel tank"
-            className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
+          <select name="fuel_tank_id" required title="Fuel tank" className={cls}>
             <option value="">Select tank</option>
             {tanks.map(t => (
               <option key={t._id} value={t._id}>
@@ -71,51 +71,41 @@ export default function FuelDispensingForm({ tanks, branches, vehicles, drivers 
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1">Branch *</label>
-          <select name="branch_id" required title="Branch"
-            className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
+          <label className="block text-xs font-medium text-gray-400 mb-1">Branch</label>
+          <select name="branch_id" title="Branch" className={cls}>
             <option value="">Select branch</option>
             {branches.map(b => <option key={b._id} value={b._id}>{b.name}</option>)}
           </select>
         </div>
 
-        <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1">Purpose *</label>
-          <select name="purpose" required title="Purpose"
-            className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
-            <option value="">Select purpose</option>
-            {PURPOSES.map(p => <option key={p} value={p}>{p.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</option>)}
-          </select>
-        </div>
+        <OtherSelect name="purpose" label="Purpose" options={PURPOSES} />
 
-        {inp('Dispensing Date', 'dispensing_date', 'date', true)}
-        {inp('Quantity Dispensed (L)', 'quantity_dispensed', 'number', true, { min: 0.01, step: '0.01' })}
-        {inp('Quantity Requested (L)', 'quantity_requested', 'number', false, { min: 0, step: '0.01' })}
+        {inp('Dispensing Date', 'dispensing_date', 'date')}
+        {inp('Quantity Dispensed (L) *', 'quantity_dispensed', 'number', { min: 0.01, step: '0.01', required: true })}
+        {inp('Quantity Requested (L)', 'quantity_requested', 'number', { min: 0, step: '0.01' })}
 
         <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1">Vehicle (optional)</label>
-          <select name="vehicle_id" title="Vehicle"
-            className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
+          <label className="block text-xs font-medium text-gray-400 mb-1">Vehicle</label>
+          <select name="vehicle_id" title="Vehicle" className={cls}>
             <option value="">No vehicle</option>
             {vehicles.map(v => <option key={v._id} value={v._id}>{v.registration_number} — {v.make} {v.model}</option>)}
           </select>
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1">Driver (optional)</label>
-          <select name="driver_id" title="Driver"
-            className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
+          <label className="block text-xs font-medium text-gray-400 mb-1">Driver</label>
+          <select name="driver_id" title="Driver" className={cls}>
             <option value="">No driver</option>
             {drivers.map(d => <option key={d._id} value={d._id}>{d.name}</option>)}
           </select>
         </div>
 
-        {inp('Vehicle Mileage (km)', 'vehicle_mileage', 'number', false, { min: 0, placeholder: 'Current odometer reading' })}
+        {inp('Vehicle Mileage (km)', 'vehicle_mileage', 'number', { min: 0, placeholder: 'Current odometer reading' })}
       </div>
 
       <div>
         <label className="block text-xs font-medium text-gray-400 mb-1">Notes</label>
-        <textarea name="notes" rows={3}
+        <textarea name="notes" title="Notes" rows={3}
           className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 resize-none" />
       </div>
 

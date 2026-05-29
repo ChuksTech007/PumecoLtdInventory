@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { IBranch, IStaff } from '@/types'
+import OtherSelect from '@/components/ui/OtherSelect'
 
-const DESIGNATIONS = ['driver', 'mechanic', 'operator', 'supervisor', 'other']
+const DESIGNATIONS = ['driver', 'mechanic', 'operator', 'supervisor', 'foreman', 'security']
 
 interface Props {
   branches: IBranch[]
@@ -35,41 +36,37 @@ export default function StaffForm({ branches, member }: Props) {
     }
   }
 
-  const inp = (label: string, name: string, type = 'text', required = false) => (
-    <div>
-      <label className="block text-xs font-medium text-gray-400 mb-1">{label}{required && ' *'}</label>
-      <input type={type} name={name} required={required}
-        defaultValue={member ? (() => {
-          const val = (member as any)[name]
-          if (val instanceof Date || (type === 'date' && val)) {
-            return new Date(val).toISOString().slice(0, 10)
-          }
-          return val ?? ''
-        })() : ''}
-        className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 transition" />
-    </div>
-  )
+  const inp = (label: string, name: string, type = 'text') => {
+    const val = member ? (member as any)[name] : ''
+    const formatted = (type === 'date' && val) ? new Date(val).toISOString().slice(0, 10) : (val ?? '')
+    return (
+      <div>
+        <label className="block text-xs font-medium text-gray-400 mb-1">{label}</label>
+        <input type={type} name={name} title={label} defaultValue={formatted}
+          className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 transition" />
+      </div>
+    )
+  }
 
   return (
     <form onSubmit={handleSubmit} className="bg-gray-900 border border-gray-800 rounded-xl p-6 space-y-5">
       {error && <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg px-4 py-3">{error}</div>}
 
       <div className="grid grid-cols-2 gap-4">
-        {inp('Full Name', 'full_name', 'text', true)}
-        {inp('Staff Number', 'staff_number', 'text', true)}
+        {inp('Full Name *', 'full_name')}
+        {inp('Staff Number', 'staff_number')}
 
-        <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1">Designation *</label>
-          <select name="designation" required defaultValue={member?.designation ?? ''} title="Designation"
-            className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
-            <option value="">Select designation</option>
-            {DESIGNATIONS.map(d => <option key={d} value={d}>{d.charAt(0).toUpperCase() + d.slice(1)}</option>)}
-          </select>
-        </div>
+        <OtherSelect
+          name="designation"
+          label="Designation"
+          options={DESIGNATIONS}
+          defaultValue={member?.designation ?? ''}
+        />
 
         <div>
           <label className="block text-xs font-medium text-gray-400 mb-1">Branch</label>
-          <select name="branch_id" defaultValue={typeof member?.branch_id === 'object' ? (member.branch_id as any)._id : (member?.branch_id ?? '')} title="Branch"
+          <select name="branch_id" title="Branch"
+            defaultValue={typeof member?.branch_id === 'object' ? (member.branch_id as any)._id : (member?.branch_id ?? '')}
             className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
             <option value="">No branch</option>
             {branches.map(b => <option key={b._id} value={b._id}>{b.name}</option>)}
@@ -88,7 +85,7 @@ export default function StaffForm({ branches, member }: Props) {
 
       <div>
         <label className="block text-xs font-medium text-gray-400 mb-1">Notes</label>
-        <textarea name="notes" rows={3} defaultValue={member?.notes ?? ''}
+        <textarea name="notes" title="Notes" rows={3} defaultValue={member?.notes ?? ''}
           className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 resize-none" />
       </div>
 

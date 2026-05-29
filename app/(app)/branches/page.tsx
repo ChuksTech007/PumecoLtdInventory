@@ -1,3 +1,4 @@
+import DeleteButton from '@/components/ui/DeleteButton'
 import { auth } from '@/auth'
 import { connectDB } from '@/lib/db'
 import BranchModel from '@/models/Branch'
@@ -20,7 +21,7 @@ export default async function BranchesPage() {
         <table className="w-full min-w-max text-sm">
           <thead>
             <tr className="border-b border-gray-800 text-gray-500 text-xs uppercase tracking-wide">
-              {['Code', 'Name', 'Location', 'State', 'Manager', 'Phone', 'Status', 'Actions'].map(h => (
+              {['Code', 'Name', 'Location', 'State', 'Manager', 'Phone', 'Status', 'Actions', ''].map(h => (
                 <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
               ))}
             </tr>
@@ -45,6 +46,9 @@ export default async function BranchesPage() {
                     <Link href={`/branches/${b._id}`} className="text-orange-400 hover:text-orange-300 text-xs">View</Link>
                     {canManage && <Link href={`/branches/${b._id}/edit`} className="text-gray-400 hover:text-white text-xs">Edit</Link>}
                   </div>
+                </td>
+                <td className="px-4 py-3">
+                  {session?.user?.role === 'admin' && <DeleteButton id={b._id.toString()} type="branch" label={b.name} />}
                 </td>
               </tr>
             ))}

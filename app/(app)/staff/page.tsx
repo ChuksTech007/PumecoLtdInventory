@@ -1,3 +1,4 @@
+import DeleteButton from '@/components/ui/DeleteButton'
 import { auth } from '@/auth'
 import { connectDB } from '@/lib/db'
 import StaffModel from '@/models/Staff'
@@ -60,7 +61,7 @@ export default async function StaffPage({ searchParams }: Props) {
         <table className="w-full min-w-max text-sm">
           <thead>
             <tr className="border-b border-gray-800 text-gray-500 text-xs uppercase tracking-wide">
-              {['Staff No.', 'Name', 'Designation', 'Branch', 'Phone', 'License Expiry', 'Status', 'Actions'].map(h => (
+              {['Staff No.', 'Name', 'Designation', 'Branch', 'Phone', 'License Expiry', 'Status', 'Actions', ''].map(h => (
                 <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
               ))}
             </tr>
@@ -92,6 +93,9 @@ export default async function StaffPage({ searchParams }: Props) {
                       <Link href={`/staff/${s._id}`} className="text-orange-400 hover:text-orange-300 text-xs">View</Link>
                       {canManage && <Link href={`/staff/${s._id}/edit`} className="text-gray-400 hover:text-white text-xs">Edit</Link>}
                     </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    {isAdmin && <DeleteButton id={s._id.toString()} type="staff" label={s.full_name} />}
                   </td>
                 </tr>
               )

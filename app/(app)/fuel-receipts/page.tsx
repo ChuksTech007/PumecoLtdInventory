@@ -1,3 +1,4 @@
+import DeleteButton from '@/components/ui/DeleteButton'
 import { auth } from '@/auth'
 import { connectDB } from '@/lib/db'
 import FuelReceiptModel from '@/models/FuelReceipt'
@@ -58,7 +59,7 @@ export default async function FuelReceiptsPage({ searchParams }: Props) {
         <table className="w-full min-w-max text-sm">
           <thead>
             <tr className="border-b border-gray-800 text-gray-500 text-xs uppercase tracking-wide">
-              {['Reference', 'Date', 'Tank', 'Branch', 'Supplier', 'Qty Received (L)', 'Total Cost', ''].map(h => (
+              {['Reference', 'Date', 'Tank', 'Branch', 'Supplier', 'Qty Received (L)', 'Total Cost', '', ''].map(h => (
                 <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
               ))}
             </tr>
@@ -78,6 +79,9 @@ export default async function FuelReceiptsPage({ searchParams }: Props) {
                 <td className="px-4 py-3 text-gray-400">{r.total_cost ? formatCurrency(r.total_cost) : '—'}</td>
                 <td className="px-4 py-3">
                   <Link href={`/fuel-receipts/${r._id}`} className="text-orange-400 hover:text-orange-300 text-xs">View</Link>
+                </td>
+                <td className="px-4 py-3">
+                  {canManage && <DeleteButton id={r._id.toString()} type="fuel-receipt" label={r.reference_number} />}
                 </td>
               </tr>
             ))}

@@ -7,6 +7,7 @@ import { StatusBadge } from '@/components/ui/Badge'
 import { displayEnum } from '@/lib/utils'
 import Link from 'next/link'
 import type { IBranch, IVehicle } from '@/types'
+import DeleteButton from '@/components/ui/DeleteButton'
 
 interface Props { searchParams: Promise<{ search?: string; status?: string; type?: string; branch?: string }> }
 
@@ -43,13 +44,13 @@ export default async function VehiclesPage({ searchParams }: Props) {
       <form className="flex flex-wrap gap-2 mb-5">
         <input name="search" defaultValue={params.search} placeholder="Search reg, make, model…"
           className="bg-gray-800 border border-gray-700 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-orange-500" />
-        <select name="status" defaultValue={params.status ?? ''}
+        <select name="status" title="Filter by status" defaultValue={params.status ?? ''}
           className="bg-gray-800 border border-gray-700 text-sm text-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-orange-500">
           <option value="">All Statuses</option>
           {['active','in_service','breakdown','decommissioned'].map(s => <option key={s} value={s}>{displayEnum(s)}</option>)}
         </select>
         {isAdmin && (
-          <select name="branch" defaultValue={params.branch ?? ''}
+          <select name="branch" title="Filter by branch" defaultValue={params.branch ?? ''}
             className="bg-gray-800 border border-gray-700 text-sm text-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-orange-500">
             <option value="">All Branches</option>
             {(branches as any[]).map(b => <option key={b._id.toString()} value={b._id.toString()}>{b.name}</option>)}
@@ -63,7 +64,7 @@ export default async function VehiclesPage({ searchParams }: Props) {
         <table className="w-full min-w-max text-sm">
           <thead>
             <tr className="border-b border-gray-800 text-gray-500 text-xs uppercase tracking-wide">
-              {['Reg. No.','Make / Model','Type','Status','Branch','Mileage (km)','Actions'].map(h => (
+              {['Reg. No.','Make / Model','Type','Status','Branch','Mileage (km)','Actions', ''].map(h => (
                 <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
               ))}
             </tr>
@@ -85,6 +86,9 @@ export default async function VehiclesPage({ searchParams }: Props) {
                     <Link href={`/vehicles/${v._id}`} className="text-orange-400 hover:text-orange-300 text-xs">View</Link>
                     {canManage && <Link href={`/vehicles/${v._id}/edit`} className="text-gray-400 hover:text-white text-xs">Edit</Link>}
                   </div>
+                </td>
+                <td className="px-4 py-3">
+                  {isAdmin && <DeleteButton id={v._id.toString()} type="vehicle" label={v.registration_number} />}
                 </td>
               </tr>
             ))}

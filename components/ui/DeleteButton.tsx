@@ -6,8 +6,8 @@ import { Trash2 } from 'lucide-react'
 
 interface Props {
   id: string
-  type: 'vehicle' | 'branch' | 'staff' | 'fuel-tank' | 'servicing'
-  redirectTo: string
+  type: 'vehicle' | 'branch' | 'staff' | 'fuel-tank' | 'servicing' | 'fuel-receipt' | 'fuel-dispensing'
+  redirectTo?: string
   label?: string
 }
 
@@ -17,6 +17,8 @@ const typeToApi: Record<string, string> = {
   staff: 'staff',
   'fuel-tank': 'fuel-tanks',
   servicing: 'servicing',
+  'fuel-receipt': 'fuel-receipts',
+  'fuel-dispensing': 'fuel-dispensings',
 }
 
 export default function DeleteButton({ id, type, redirectTo, label }: Props) {
@@ -26,8 +28,15 @@ export default function DeleteButton({ id, type, redirectTo, label }: Props) {
 
   async function handleDelete() {
     setLoading(true)
-    await fetch(`/api/${typeToApi[type]}/${id}`, { method: 'DELETE' })
-    router.push(redirectTo)
+    const res = await fetch(`/api/${typeToApi[type]}/${id}`, { method: 'DELETE' })
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}))
+      alert(j.error ?? 'Delete failed. Please try again.')
+      setLoading(false)
+      setConfirming(false)
+      return
+    }
+    if (redirectTo) router.push(redirectTo)
     router.refresh()
   }
 

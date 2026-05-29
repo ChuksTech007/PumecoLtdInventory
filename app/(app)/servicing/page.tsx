@@ -1,3 +1,4 @@
+import DeleteButton from '@/components/ui/DeleteButton'
 import { auth } from '@/auth'
 import { connectDB } from '@/lib/db'
 import ServiceRecordModel from '@/models/ServiceRecord'
@@ -37,14 +38,14 @@ export default async function ServicingPage({ searchParams }: Props) {
       <PageHeader title="Service Records" description={`${records.length} record(s)`} action={canManage ? { href: '/servicing/new', label: '+ New Record' } : undefined} />
 
       <form className="flex flex-wrap gap-2 mb-5">
-        <select name="status" defaultValue={params.status ?? ''}
+        <select name="status" title="Filter by status" defaultValue={params.status ?? ''}
           className="bg-gray-800 border border-gray-700 text-sm text-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-orange-500">
           <option value="">All Statuses</option>
           {['pending','in_progress','completed','cancelled'].map(s => <option key={s} value={s}>{displayEnum(s)}</option>)}
         </select>
-        <input type="date" name="from_date" defaultValue={params.from_date ?? ''}
+        <input type="date" name="from_date" title="From date" defaultValue={params.from_date ?? ''}
           className="bg-gray-800 border border-gray-700 text-gray-300 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-orange-500" />
-        <input type="date" name="to_date" defaultValue={params.to_date ?? ''}
+        <input type="date" name="to_date" title="To date" defaultValue={params.to_date ?? ''}
           className="bg-gray-800 border border-gray-700 text-gray-300 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-orange-500" />
         <button type="submit" className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition">Filter</button>
         <Link href="/servicing" className="text-gray-400 hover:text-white text-sm px-4 py-2 rounded-lg hover:bg-gray-800 transition">Clear</Link>
@@ -54,7 +55,7 @@ export default async function ServicingPage({ searchParams }: Props) {
         <table className="w-full min-w-max text-sm">
           <thead>
             <tr className="border-b border-gray-800 text-gray-500 text-xs uppercase">
-              {['Reference','Vehicle','Type','Status','Date','Cost',''].map(h => <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>)}
+              {['Reference','Vehicle','Type','Status','Date','Cost','',''].map(h => <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>)}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-800">
@@ -69,6 +70,9 @@ export default async function ServicingPage({ searchParams }: Props) {
                 <td className="px-4 py-3 text-gray-400">{formatCurrency(r.total_cost ?? 0)}</td>
                 <td className="px-4 py-3">
                   <Link href={`/servicing/${r._id}`} className="text-orange-400 hover:text-orange-300 text-xs">View</Link>
+                </td>
+                <td className="px-4 py-3">
+                  {canManage && <DeleteButton id={r._id.toString()} type="servicing" label={r.reference_number} />}
                 </td>
               </tr>
             ))}
