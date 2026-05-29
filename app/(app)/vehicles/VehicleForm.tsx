@@ -61,7 +61,7 @@ export default function VehicleForm({ branches, drivers, vehicle }: Props) {
       {error && <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg px-4 py-3">{error}</div>}
 
       <div className="grid grid-cols-2 gap-4">
-        {field('Registration Number *', 'registration_number')}
+        {field('Registration Number', 'registration_number')}
         {field('Fleet Number', 'fleet_number')}
         {field('Make', 'make')}
         {field('Model', 'model')}

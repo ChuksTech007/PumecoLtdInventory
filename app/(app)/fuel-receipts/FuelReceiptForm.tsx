@@ -35,10 +35,10 @@ export default function FuelReceiptForm({ tanks, branches }: Props) {
     }
   }
 
-  const inp = (label: string, name: string, type = 'text', required = false, extra?: any) => (
+  const inp = (label: string, name: string, type = 'text', extra?: any) => (
     <div>
-      <label className="block text-xs font-medium text-gray-400 mb-1">{label}{required && ' *'}</label>
-      <input type={type} name={name} required={required}
+      <label className="block text-xs font-medium text-gray-400 mb-1">{label}</label>
+      <input type={type} name={name} title={label}
         className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 transition"
         {...extra} />
     </div>
@@ -49,13 +49,13 @@ export default function FuelReceiptForm({ tanks, branches }: Props) {
       {error && <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg px-4 py-3">{error}</div>}
 
       <div className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-xs rounded-lg px-4 py-3">
-        Note: Tank fuel level will be automatically updated upon receipt creation.
+        Tank fuel level will be automatically updated upon receipt creation.
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1">Fuel Tank *</label>
-          <select name="fuel_tank_id" required title="Fuel tank"
+          <label className="block text-xs font-medium text-gray-400 mb-1">Fuel Tank</label>
+          <select name="fuel_tank_id" title="Fuel tank"
             className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
             <option value="">Select tank</option>
             {tanks.map(t => <option key={t._id} value={t._id}>{t.name} ({(t as any).tank_number})</option>)}
@@ -63,18 +63,18 @@ export default function FuelReceiptForm({ tanks, branches }: Props) {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1">Branch *</label>
-          <select name="branch_id" required title="Branch"
+          <label className="block text-xs font-medium text-gray-400 mb-1">Branch</label>
+          <select name="branch_id" title="Branch"
             className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
             <option value="">Select branch</option>
             {branches.map(b => <option key={b._id} value={b._id}>{b.name}</option>)}
           </select>
         </div>
 
-        {inp('Receipt Date', 'receipt_date', 'date', true)}
-        {inp('Quantity Received (L)', 'quantity_received', 'number', true, { min: 0.01, step: '0.01' })}
-        {inp('Quantity Ordered (L)', 'quantity_ordered', 'number', false, { min: 0, step: '0.01' })}
-        {inp('Price per Litre (₦)', 'price_per_litre', 'number', false, { min: 0, step: '0.01' })}
+        {inp('Receipt Date', 'receipt_date', 'date')}
+        {inp('Quantity Received (L)', 'quantity_received', 'number', { min: 0.01, step: '0.01' })}
+        {inp('Quantity Ordered (L)', 'quantity_ordered', 'number', { min: 0, step: '0.01' })}
+        {inp('Price per Litre (₦)', 'price_per_litre', 'number', { min: 0, step: '0.01' })}
         {inp('Supplier Name', 'supplier_name')}
         {inp('Waybill Number', 'waybill_number')}
         {inp('Invoice Number', 'invoice_number')}
@@ -82,7 +82,7 @@ export default function FuelReceiptForm({ tanks, branches }: Props) {
 
       <div>
         <label className="block text-xs font-medium text-gray-400 mb-1">Notes</label>
-        <textarea name="notes" rows={3}
+        <textarea name="notes" title="Notes" rows={3}
           className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 resize-none" />
       </div>
 

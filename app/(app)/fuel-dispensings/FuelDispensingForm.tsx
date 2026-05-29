@@ -60,7 +60,7 @@ export default function FuelDispensingForm({ tanks, branches, vehicles, drivers 
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-xs font-medium text-gray-400 mb-1">Fuel Tank *</label>
-          <select name="fuel_tank_id" required title="Fuel tank" className={cls}>
+          <select name="fuel_tank_id" title="Fuel tank" className={cls}>
             <option value="">Select tank</option>
             {tanks.map(t => (
               <option key={t._id} value={t._id}>
@@ -81,7 +81,7 @@ export default function FuelDispensingForm({ tanks, branches, vehicles, drivers 
         <OtherSelect name="purpose" label="Purpose" options={PURPOSES} />
 
         {inp('Dispensing Date', 'dispensing_date', 'date')}
-        {inp('Quantity Dispensed (L) *', 'quantity_dispensed', 'number', { min: 0.01, step: '0.01', required: true })}
+        {inp('Quantity Dispensed (L)', 'quantity_dispensed', 'number', { min: 0.01, step: '0.01' })}
         {inp('Quantity Requested (L)', 'quantity_requested', 'number', { min: 0, step: '0.01' })}
 
         <div>

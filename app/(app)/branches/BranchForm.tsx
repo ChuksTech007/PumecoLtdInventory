@@ -30,10 +30,10 @@ export default function BranchForm({ branch }: Props) {
     }
   }
 
-  const inp = (label: string, name: string, type = 'text', required = false) => (
+  const inp = (label: string, name: string, type = 'text') => (
     <div>
-      <label className="block text-xs font-medium text-gray-400 mb-1">{label}{required && ' *'}</label>
-      <input type={type} name={name} required={required} defaultValue={branch ? (branch as any)[name] ?? '' : ''}
+      <label className="block text-xs font-medium text-gray-400 mb-1">{label}</label>
+      <input type={type} name={name} title={label} defaultValue={branch ? (branch as any)[name] ?? '' : ''}
         className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 transition" />
     </div>
   )
@@ -43,9 +43,9 @@ export default function BranchForm({ branch }: Props) {
       {error && <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg px-4 py-3">{error}</div>}
 
       <div className="grid grid-cols-2 gap-4">
-        {inp('Branch Name', 'name', 'text', true)}
-        {inp('Branch Code', 'code', 'text', true)}
-        {inp('Location / City', 'location', 'text', true)}
+        {inp('Branch Name', 'name')}
+        {inp('Branch Code', 'code')}
+        {inp('Location / City', 'location')}
         {inp('State', 'state')}
         {inp('Address', 'address')}
         {inp('Manager Name', 'manager_name')}
@@ -55,7 +55,7 @@ export default function BranchForm({ branch }: Props) {
 
       <div>
         <label className="block text-xs font-medium text-gray-400 mb-1">Notes</label>
-        <textarea name="notes" rows={3} defaultValue={branch?.notes ?? ''}
+        <textarea name="notes" title="Notes" rows={3} defaultValue={branch?.notes ?? ''}
           className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 resize-none" />
       </div>
 

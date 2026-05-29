@@ -47,7 +47,7 @@ export default function ServiceForm({ vehicles, branches, record, preselectedVeh
     <form onSubmit={handleSubmit} className="bg-gray-900 border border-gray-800 rounded-xl p-6 space-y-5">
       {error && <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg px-4 py-3">{error}</div>}
       <div className="grid grid-cols-2 gap-4">
-        {sel('Vehicle *', 'vehicle_id', vehicles.map(v => ({ v: v._id, l: v.registration_number })), preselectedVehicleId)}
+        {sel('Vehicle', 'vehicle_id', vehicles.map(v => ({ v: v._id, l: v.registration_number })), preselectedVehicleId)}
         {sel('Branch', 'branch_id', branches.map(b => ({ v: b._id, l: b.name })))}
         <OtherSelect name="service_type" label="Service Type" options={SERVICE_TYPES} defaultValue={record?.service_type ?? ''} />
         {sel('Status', 'status', ['pending','in_progress','completed','cancelled'].map(s => ({ v: s, l: s.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()) })), record?.status ?? 'pending')}
